@@ -143,9 +143,14 @@ def feed_to_db_files(directory, feed_file):
 				for key in elem_dict.keys():
 					if elem_dict[key]:
 						elem_dict[key] = elem_dict[key].replace(u"\ufffd", "N")
+						elem_dict[key] = elem_dict[key].replace(u'\u201d', "")
+						elem_dict[key] = elem_dict[key].replace(u'\u201c', "")
+						elem_dict[key] = elem_dict[key].replace(u'\u2019', "")
+						elem_dict[key] = elem_dict[key].replace(u'\xbd', "")
+						elem_dict[key] = elem_dict[key].replace(u'\xf3', "")
 						elem_dict[key] = elem_dict[key].replace(u'\xa0', "")
-						elem_dict[key] = elem_dict[key].replace(u'\u201c', "N")
-						elem_dict[key] = elem_dict[key].replace(u'\u201d', "N")
+						elem_dict[key] = elem_dict[key].replace(u'\xe9', "")
+						elem_dict[key] = elem_dict[key].replace(u'\xe1', "")
 				writer.writerow(elem_dict)
 
 			for extra in extras:
