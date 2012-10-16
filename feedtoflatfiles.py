@@ -2,7 +2,7 @@ from lxml import etree
 from csv import DictWriter, DictReader
 from os import path
 from copy import copy
-import csv
+import csv, argparse, os
 from schemaprops import SchemaProps
 
 SCHEMA_URL = "https://github.com/votinginfoproject/vip-specification/raw/master/vip_spec_v3.0.xsd"
@@ -241,3 +241,30 @@ def update_version(directory, version):
 		change_cols(directory, "referendum_ballot_response.txt", "order", "sort_order")
 	if version == "2.1" and path.exists(directory + "custom_ballot_ballot_response.txt"):
 		change_cols(directory, "custom_ballot_ballot_response.txt", "order", "sort_order")	
+
+def extant_file(fpath):
+    """'Type' for argparse - checks that file exists but does not open.                                                                                                 
+                                                                                                                                                                        
+    Positional arguments                                                                                                                                                
+    fpath -- the filepath to be checked                                                                                                                                 
+    """
+    if not os.path.exists(fpath):
+	    raise argparse.ArgumentError("{0} does not exist".format(fpath))
+    return fpath
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='''Creates flatfiles from a VIP feed''')
+
+    parser.add_argument("feed_file", type=extant_file,
+                        help="the VIP feed", metavar="FILE")
+    parser.add_argument("--output-format", type=unicode, choices=['element', 'database'],
+                        dest="output_format", default="database", help="the file output format")
+    parser.add_argument("-d", "--dir", type=unicode,
+                        dest="directory", help="the directory path")
+
+    args = parser.parse_args()
+
+    if args.output_format=='element':
+	    feed_to_element_files(args)
+    elif args.output_format=='database':
+	    feed_to_db_files(args.directory, args.feed_file)
