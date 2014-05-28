@@ -1,6 +1,7 @@
 from schema import Schema
 from urllib import urlopen
 from os import path
+from collections import OrderedDict
 
 SCHEMA_URL = "https://github.com/votinginfoproject/vip-specification/raw/master/vip_spec_v"
 VALID_VERSIONS = ["4.0", "3.0", "2.3", "2.2", "2.1"]
@@ -28,7 +29,7 @@ class SchemaProps:
 		self.create_headers()
 
 	def address_fields(self, e_name, e_type, required):
-		e_list = {}
+		e_list = OrderedDict()
 		for e in self.schema.get_sub_schema(e_type)["elements"]:
 			if required and ("minOccurs" not in e or int(e["minOccurs"]) > 0):
 				e_list[e_name + "_" + e["name"]] = {"type":e["type"],"is_required":"true"}
@@ -43,7 +44,7 @@ class SchemaProps:
 		self.conversion_data = {}
 		self.db_types = {}
 		self.element_types = {}
-		
+
 		for elem_name in self.element_list:
 
 			subschema = self.schema.get_sub_schema(elem_name)
@@ -73,7 +74,7 @@ class SchemaProps:
 						element_type[e_name] = {"type":e["type"],"is_required":"false"}
 						sc_name = elem_name + "_" + e_name[:e_name.find("_id")]
 						conversion_list[sc_name] = {"id":elem_name + "_id", e_name:e_name}
-						temp_list = [elem_name + "_id", e_name]				 
+						temp_list = [elem_name + "_id", e_name]
 						temp_dict = {elem_name + "_id":{"type":"xs:integer","is_required":"true"}, e_name:{"type":e["type"],"is_required":"true"}}
 						for sc_attr in e["simpleContent"]["attributes"]:
 							elem_list.append(e_name + "_" + sc_attr["name"])
@@ -116,7 +117,7 @@ class SchemaProps:
 			self.db_header[elem_name] = db_list
 			self.db_types[elem_name] = db_type
 			self.conversion_data[elem_name] = conversion_list
-	
+
 	def header(self, file_format, element):
 		if file_format == "db":
 			return self.db_header[element]
@@ -166,4 +167,4 @@ if __name__ == "__main__":
 	print sp.full_type_data("db")
 	print sp.full_type_data("element")
 	print sp.full_header_data("db")
-	
+
