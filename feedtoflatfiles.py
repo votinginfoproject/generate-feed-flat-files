@@ -20,8 +20,8 @@ def extract_base_elements(context, element_list):
 
 def file_writer(directory, e_name, fields):
 
-	output_file = directory + e_name + ".txt"
-		
+	output_file = path.join(directory, e_name) + ".txt"
+
 	if path.exists(output_file):
 		return DictWriter(open(output_file, "a"), fieldnames=fields)
 	else:
@@ -30,38 +30,38 @@ def file_writer(directory, e_name, fields):
 		return w
 
 def element_extras(extras, elem_dict):
-		
+
 	for row in extras:
-			
+
 		temp_dict = copy(elem_dict)
-			
+
 		e_name = row.keys()[0]
 		temp_dict[e_name] = row[e_name]["val"]
-			
+
 		if len(row[e_name]["attributes"]) > 0:
 			for attr in row[e_name]["attributes"]:
 				temp_dict[e_name + "_" + attr] = row[e_name]["attributes"][attr]
-			
+
 		yield temp_dict
 
 def process_sub_elems(elem, elem_fields):
 	elem_dict = dict.fromkeys(elem_fields, '')
 	elem_dict["id"] = elem.get("id")
-			
+
 	sub_elems = elem.getchildren()
 	extras = []
-		
+
 	for sub_elem in sub_elems:
 
 		if sub_elem.tag.endswith("address"):
-				
+
 			add_elems = sub_elem.getchildren()
-			
+
 			for add_elem in add_elems:
 				elem_dict[sub_elem.tag + "_" + add_elem.tag] = add_elem.text
-		
+
 		elif len(elem_dict[sub_elem.tag]) > 0:
-			extras.append({sub_elem.tag:{"val":sub_elem.text, "attributes":sub_elem.attrib}}) 
+			extras.append({sub_elem.tag:{"val":sub_elem.text, "attributes":sub_elem.attrib}})
 		else:
 			elem_dict[sub_elem.tag] = sub_elem.text
 
@@ -72,7 +72,7 @@ def process_db_sub_elems(elem, elem_fields):
 	elem_dict["id"] = elem.get("id")
 
 	sub_elems = elem.getchildren()
-	extras = [] 
+	extras = []
 
 	for sub_elem in sub_elems:
 		sub_name = sub_elem.tag
@@ -102,21 +102,21 @@ def feed_to_element_files(output_directory, feed_file, element_props, version):
 		feed_version = root.attrib["schemaVersion"]
 		if feed_version != version:
 			print "version error"
-		
+
 		e_name = ""
 
 		for elem in extract_base_elements(context, element_props.keys()):
 			if elem.tag != e_name:
-			
+
 				e_name = elem.tag
 				writer = file_writer(output_directory, e_name, element_props[e_name])
-		
+
 			elem_dict, extras = process_sub_elems(elem, element_props[e_name])
-		
+
 			writer.writerow(elem_dict)
 
 			for row_dict in element_extras(extras, elem_dict):
-				writer.writerow(row_dict)	
+				writer.writerow(row_dict)
 
 def feed_to_db_files(directory, feed_file):
 	with open(feed_file) as xml_doc:
@@ -125,17 +125,15 @@ def feed_to_db_files(directory, feed_file):
 
 		event, root = context.next()
 		feed_version = root.attrib["schemaVersion"]
-		
+
 		sp = SchemaProps(feed_version)
 		db_props = sp.full_header_data("db")
-		
+
 		e_name = ""
 		for elem in extract_base_elements(context, db_props.keys()):
 			if elem.tag != e_name:
-			
 				e_name = elem.tag
 				writer = file_writer(directory, e_name, db_props[e_name])
-		
 			elem_dict, extras = process_db_sub_elems(elem, db_props)
 			try:
 				writer.writerow(elem_dict)
@@ -228,10 +226,10 @@ def update_version(directory, version):
 			if len(state_ev_site) > 0:
 				write_conversion(directory, state_ev_site, "state_early_vote_site.txt", ["state_id", "early_vote_site_id"])
 		remove_columns(directory, "early_vote_site.txt", data, reader.fieldnames, ["locality_id", "state_id"])
-	
+
 	if (version == "2.3" or version == "2.2") and path.exists(directory + "locality.txt"):
 		read_remove_cols(directory, "locality.txt", ["ballot_style_image_url", "polling_location_id"])
-		
+
 	if (version == "2.1" or version == "2.2") and path.exists(directory + "polling_location.txt"):
 		read_remove_cols(directory, "polling_location.txt", ["name"])
 
@@ -240,13 +238,13 @@ def update_version(directory, version):
 	if version == "2.1" and path.exists(directory + "referendum_ballot_response.txt"):
 		change_cols(directory, "referendum_ballot_response.txt", "order", "sort_order")
 	if version == "2.1" and path.exists(directory + "custom_ballot_ballot_response.txt"):
-		change_cols(directory, "custom_ballot_ballot_response.txt", "order", "sort_order")	
+		change_cols(directory, "custom_ballot_ballot_response.txt", "order", "sort_order")
 
 def extant_file(fpath):
-    """'Type' for argparse - checks that file exists but does not open.                                                                                                 
-                                                                                                                                                                        
-    Positional arguments                                                                                                                                                
-    fpath -- the filepath to be checked                                                                                                                                 
+    """'Type' for argparse - checks that file exists but does not open.
+
+    Positional arguments
+    fpath -- the filepath to be checked
     """
     if not os.path.exists(fpath):
 	    raise argparse.ArgumentError("{0} does not exist".format(fpath))
