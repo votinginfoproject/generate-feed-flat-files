@@ -262,9 +262,9 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-	if args.output_format=='element':
-		feed_to_element_files(args)
-	elif args.output_format=='database':
-		if not args.directory:
-			parser.error("A directory must be specified.")
-		feed_to_db_files(args.directory, args.feed_file)
+    if args.output_format=='element':
+        feed_to_element_files(args)
+    elif args.output_format=='database':
+        if not args.directory:
+            parser.error("A directory must be specified.")
+        feed_to_db_files(args.directory, args.feed_file)
