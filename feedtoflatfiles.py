@@ -247,7 +247,7 @@ def extant_file(fpath):
     fpath -- the filepath to be checked
     """
     if not os.path.exists(fpath):
-	    raise argparse.ArgumentError("{0} does not exist".format(fpath))
+	    raise argparse.ArgumentTypeError("{0} does not exist".format(fpath))
     return fpath
 
 if __name__ == '__main__':
@@ -257,12 +257,14 @@ if __name__ == '__main__':
                         help="the VIP feed", metavar="FILE")
     parser.add_argument("--output-format", type=unicode, choices=['element', 'database'],
                         dest="output_format", default="database", help="the file output format")
-    parser.add_argument("-d", "--dir", type=unicode,
+    parser.add_argument("-d", "--dir", type=extant_file,
                         dest="directory", help="the directory path")
 
     args = parser.parse_args()
 
     if args.output_format=='element':
-	    feed_to_element_files(args)
+        feed_to_element_files(args)
     elif args.output_format=='database':
-	    feed_to_db_files(args.directory, args.feed_file)
+        if not args.directory:
+            parser.error("A directory must be specified.")
+        feed_to_db_files(args.directory, args.feed_file)
