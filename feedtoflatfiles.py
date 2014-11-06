@@ -1,5 +1,5 @@
 from lxml import etree
-from csv import DictWriter, DictReader
+import csv
 from os import path
 from copy import copy
 import csv, argparse, os
@@ -23,9 +23,9 @@ def file_writer(directory, e_name, fields):
 	output_file = path.join(directory, e_name) + ".txt"
 
 	if path.exists(output_file):
-		return DictWriter(open(output_file, "a"), fieldnames=fields)
+		return csv.DictWriter(open(output_file, "a"), fieldnames=fields, quoting=csv.QUOTE_ALL)
 	else:
-		w = DictWriter(open(output_file, "w"), fieldnames=fields)
+		w = csv.DictWriter(open(output_file, "w"), fieldnames=fields, quoting=csv.QUOTE_ALL)
 		w.writeheader()
 		return w
 
@@ -177,7 +177,7 @@ def remove_columns(directory, fname, data, cols, bad_cols):
 		for c in bad_cols:
 			if c in cols:
 				cols.remove(c)
-		writer = DictWriter(w, fieldnames=cols)
+		writer = csv.DictWriter(w, fieldnames=cols, quoting=csv.QUOTE_ALL)
 		writer.writeheader()
 		for row in data:
 			for c in bad_cols:
@@ -187,20 +187,20 @@ def remove_columns(directory, fname, data, cols, bad_cols):
 
 def read_remove_cols(directory, fname, bad_cols):
 	with open(directory + fname, "r") as r:
-		reader = DictReader(r)
+		reader = csv.DictReader(r)
 		data = list(reader)
 	remove_columns(directory, fname, data, reader.fieldnames, bad_cols)
 
 def change_cols(directory, fname, old_col, new_col):
 	with open(directory + fname, "r") as r:
-		reader = DictReader(r)
+		reader = csv.DictReader(r)
 		data = list(reader)
 	header = reader.fieldnames
 	if old_col in header:
 		header.remove(old_col)
 		header.append(new_col)
 		with open(directory + fname, "w") as w:
-			writer = DictWriter(w, fieldnames=header)
+			writer = csv.DictWriter(w, fieldnames=header, quoting=csv.QUOTE_ALL)
 			writer.writeheader()
 			for row in data:
 				row[new_col] = row.pop(old_col)
@@ -217,7 +217,7 @@ def update_version(directory, version):
 
 	if path.exists(directory + "early_vote_site.txt"):
 		with open(directory + "early_vote_site.txt", "r") as r:
-			reader = DictReader(r)
+			reader = csv.DictReader(r)
 			data = list(reader)
 			locality_ev_site = get_conversion("locality_id", data)
 			state_ev_site = get_conversion("state_id", data)
