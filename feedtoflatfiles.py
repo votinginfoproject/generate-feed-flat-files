@@ -23,9 +23,9 @@ def file_writer(directory, e_name, fields):
 	output_file = path.join(directory, e_name) + ".txt"
 
 	if path.exists(output_file):
-		return csv.DictWriter(open(output_file, "a"), fieldnames=fields, quoting=csv.QUOTE_ALL)
+		return csv.DictWriter(open(output_file, "a"), fieldnames=fields, quoting=csv.QUOTE_MINIMAL)
 	else:
-		w = csv.DictWriter(open(output_file, "w"), fieldnames=fields, quoting=csv.QUOTE_ALL)
+		w = csv.DictWriter(open(output_file, "w"), fieldnames=fields, quoting=csv.QUOTE_MINIMAL)
 		w.writeheader()
 		return w
 
