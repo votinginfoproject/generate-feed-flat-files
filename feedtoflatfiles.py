@@ -5,7 +5,7 @@ from copy import copy
 import csv, argparse, os
 from schemaprops import SchemaProps
 
-SCHEMA_URL = "https://github.com/votinginfoproject/vip-specification/raw/master/vip_spec_v3.0.xsd"
+SCHEMA_URL = "https://github.com/votinginfoproject/vip-specification/raw/v3-archive/vip_spec_v3.0.xsd"
 
 def clear_element(element):
 	element.clear()
