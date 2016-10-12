@@ -149,6 +149,9 @@ def feed_to_db_files(directory, feed_file):
 						elem_dict[key] = elem_dict[key].replace(u'\xa0', "")
 						elem_dict[key] = elem_dict[key].replace(u'\xe9', "")
 						elem_dict[key] = elem_dict[key].replace(u'\xe1', "")
+						elem_dict[key] = elem_dict[key].replace(u'\xbc', "0.25")
+						elem_dict[key] = elem_dict[key].replace(u'\u2013', "-")
+
 				writer.writerow(elem_dict)
 
 			for extra in extras:
