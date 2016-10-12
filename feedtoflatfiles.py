@@ -1,9 +1,11 @@
 from lxml import etree
-import csv
 from os import path
 from copy import copy
 import csv, argparse, os
 from schemaprops import SchemaProps
+from pprint import pformat
+from unicodewriter import UnicodeDictWriter
+
 
 SCHEMA_URL = "https://github.com/votinginfoproject/vip-specification/raw/v3-archive/vip_spec_v3.0.xsd"
 
@@ -23,9 +25,9 @@ def file_writer(directory, e_name, fields):
 	output_file = path.join(directory, e_name) + ".txt"
 
 	if path.exists(output_file):
-		return csv.DictWriter(open(output_file, "a"), fieldnames=fields, quoting=csv.QUOTE_MINIMAL)
+		return UnicodeDictWriter(open(output_file, "a"), fieldnames=fields, quoting=csv.QUOTE_MINIMAL)
 	else:
-		w = csv.DictWriter(open(output_file, "w"), fieldnames=fields, quoting=csv.QUOTE_MINIMAL)
+		w = UnicodeDictWriter(open(output_file, "w"), fieldnames=fields, quoting=csv.QUOTE_MINIMAL)
 		w.writeheader()
 		return w
 
@@ -138,18 +140,7 @@ def feed_to_db_files(directory, feed_file):
 			try:
 				writer.writerow(elem_dict)
 			except UnicodeEncodeError:
-				for key in elem_dict.keys():
-					if elem_dict[key]:
-						elem_dict[key] = elem_dict[key].replace(u"\ufffd", "N")
-						elem_dict[key] = elem_dict[key].replace(u'\u201d', "")
-						elem_dict[key] = elem_dict[key].replace(u'\u201c', "")
-						elem_dict[key] = elem_dict[key].replace(u'\u2019', "")
-						elem_dict[key] = elem_dict[key].replace(u'\xbd', "")
-						elem_dict[key] = elem_dict[key].replace(u'\xf3', "")
-						elem_dict[key] = elem_dict[key].replace(u'\xa0', "")
-						elem_dict[key] = elem_dict[key].replace(u'\xe9', "")
-						elem_dict[key] = elem_dict[key].replace(u'\xe1', "")
-				writer.writerow(elem_dict)
+				print "barfing with unicode encode error " + pformat(elem_dict)
 
 			for extra in extras:
 				temp_writer = file_writer(directory, extra["table"], db_props[extra["table"]])
