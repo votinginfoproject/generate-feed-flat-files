@@ -49,7 +49,7 @@ class UnicodeDictWriter:
         self.writer.writerow(self.fieldnames)
 
     def writerow(self, row):
-        self.writer.writerow([row[x].encode("utf-8") for x in self.fieldnames if row[x]])
+        self.writer.writerow([row[x].encode("utf-8") for x in self.fieldnames])
 
         data = self.queue.getvalue()
         data = data.decode("utf-8")
