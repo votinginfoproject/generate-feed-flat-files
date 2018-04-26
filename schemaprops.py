@@ -3,7 +3,8 @@ from urllib import urlopen
 from os import path
 from collections import OrderedDict
 
-SCHEMA_URL = "https://github.com/votinginfoproject/vip-specification/raw/v3-archive/vip_spec_v"
+SCHEMA_URL = "https://raw.githubusercontent.com/votinginfoproject/vip-specification/v3-archive/vip_spec_v"
+#SCHEMA_URL = "https://github.com/votinginfoproject/vip-specification/raw/v3-archive/vip_spec_v"
 VALID_VERSIONS = ["4.0", "3.0", "2.3", "2.2", "2.1"]
 DEFAULT_VERSION = "3.0"
 
@@ -167,4 +168,3 @@ if __name__ == "__main__":
 	print sp.full_type_data("db")
 	print sp.full_type_data("element")
 	print sp.full_header_data("db")
-
