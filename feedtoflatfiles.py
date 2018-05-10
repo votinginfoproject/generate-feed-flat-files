@@ -87,13 +87,16 @@ def process_db_sub_elems(elem, elem_fields):
 				        elem_dict[sub_name + "_" + add_elem.tag] = format_element_text(add_elem)
 		elif sub_name not in elem_dict:
 			table_name = elem.tag + "_" + sub_name[:sub_name.find("_id")]
-			extra = {"table":table_name, "elements":dict.fromkeys(elem_fields[table_name])}
-			extra["elements"][elem.tag + "_id"] = elem.get("id")
-			extra["elements"][sub_name] = format_element_text(sub_elem)
-			attributes = sub_elem.attrib
-			for a in attributes:
-				extra["elements"][a] = attributes[a]
-			extras.append(extra)
+			if table_name in elem_fields.keys():
+				extra = {"table":table_name, "elements":dict.fromkeys(elem_fields[table_name])}
+				extra["elements"][elem.tag + "_id"] = elem.get("id")
+				extra["elements"][sub_name] = format_element_text(sub_elem)
+				attributes = sub_elem.attrib
+				for a in attributes:
+					extra["elements"][a] = attributes[a]
+				extras.append(extra)
+			else:
+				print sub_name + " not a field type in " + table_name
 		else:
                         if sub_elem.text:
 			        elem_dict[sub_name] = format_element_text(sub_elem)
