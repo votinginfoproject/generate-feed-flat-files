@@ -7,9 +7,6 @@ from schemaprops import SchemaProps
 
 SCHEMA_URL = "https://github.com/votinginfoproject/vip-specification/raw/v3-archive/vip_spec_v3.0.xsd"
 
-def format_element_text(elem):
-        return ' '.join([line.strip() for line in elem.text.splitlines()])
-
 def clear_element(element):
 	element.clear()
 	while element.getprevious() is not None:
@@ -61,11 +58,10 @@ def process_sub_elems(elem, elem_fields):
 			add_elems = sub_elem.getchildren()
 
 			for add_elem in add_elems:
-				elem_dict[sub_elem.tag + "_" + add_elem.tag] = format_element_text(add_elem)
+				elem_dict[sub_elem.tag + "_" + add_elem.tag] = add_elem.text
 
 		elif len(elem_dict[sub_elem.tag]) > 0:
-			extras.append({sub_elem.tag:{"val": format_element_text(sub_elem),
-                                                     "attributes": sub_elem.attrib}})
+			extras.append({sub_elem.tag:{"val":sub_elem.text, "attributes":sub_elem.attrib}})
 		else:
 			elem_dict[sub_elem.tag] = sub_elem.text
 
@@ -83,23 +79,18 @@ def process_db_sub_elems(elem, elem_fields):
 		if sub_name.endswith("address"):
 			add_elems = sub_elem.getchildren()
 			for add_elem in add_elems:
-                                if add_elem.text:
-				        elem_dict[sub_name + "_" + add_elem.tag] = format_element_text(add_elem)
+				elem_dict[sub_name + "_" + add_elem.tag] = add_elem.text
 		elif sub_name not in elem_dict:
 			table_name = elem.tag + "_" + sub_name[:sub_name.find("_id")]
-			if table_name in elem_fields.keys():
-				extra = {"table":table_name, "elements":dict.fromkeys(elem_fields[table_name])}
-				extra["elements"][elem.tag + "_id"] = elem.get("id")
-				extra["elements"][sub_name] = format_element_text(sub_elem)
-				attributes = sub_elem.attrib
-				for a in attributes:
-					extra["elements"][a] = attributes[a]
-				extras.append(extra)
-			else:
-				print sub_name + " not a field type in " + table_name
+			extra = {"table":table_name, "elements":dict.fromkeys(elem_fields[table_name])}
+			extra["elements"][elem.tag + "_id"] = elem.get("id")
+			extra["elements"][sub_name] = sub_elem.text
+			attributes = sub_elem.attrib
+			for a in attributes:
+				extra["elements"][a] = attributes[a]
+			extras.append(extra)
 		else:
-                        if sub_elem.text:
-			        elem_dict[sub_name] = format_element_text(sub_elem)
+			elem_dict[sub_name] = sub_elem.text
 	return elem_dict, extras
 
 def feed_to_element_files(output_directory, feed_file, element_props, version):
@@ -158,6 +149,18 @@ def feed_to_db_files(directory, feed_file):
 						elem_dict[key] = elem_dict[key].replace(u'\xa0', "")
 						elem_dict[key] = elem_dict[key].replace(u'\xe9', "")
 						elem_dict[key] = elem_dict[key].replace(u'\xe1', "")
+						elem_dict[key] = elem_dict[key].replace(u'\xf1', "n")
+						elem_dict[key] = elem_dict[key].replace(u'\u2013', "-")
+						elem_dict[key] = elem_dict[key].replace(u'\u2014', "-")
+						elem_dict[key] = elem_dict[key].replace(u'\xed', "-")
+						elem_dict[key] = elem_dict[key].replace(u'\u2022',"-")
+						elem_dict[key] = elem_dict[key].replace(u'\xa7',"-")
+						elem_dict[key] = elem_dict[key].replace(u'\xb7',"-")
+						elem_dict[key] = elem_dict[key].replace(u'\u200e',"-")
+						elem_dict[key] = elem_dict[key].replace(u'\xc0',"A")
+						elem_dict[key] = elem_dict[key].replace(u'\u20ac',"$$")
+						elem_dict[key] = elem_dict[key].replace(u'\xe2','a')
+						elem_dict[key] = elem_dict[key].replace(u'\u2122','')
 				writer.writerow(elem_dict)
 
 			for extra in extras:
