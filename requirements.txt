@@ -1,5 +1,5 @@
 distribute
-lxml==3.3.5
+lxml==4.6.3
 python-magic==0.4.6
 rarfile==2.6
 wsgiref
